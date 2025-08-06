@@ -1,1 +1,75 @@
-# diatom_prefect
+# Diatom prefect
+
+This project uses [Prefect](https://www.prefect.io/) to download and set up a series of image folders. It produces a directory structure specially adequate for image training:
+
+```
+data
+└───downloads
+│   |─ file1.zip
+│   |─ file2.zip
+│   |─ ...
+└───results
+    │─ train
+        └─ class_folder_1
+        └─ class_folder_2
+        └─ class_folder_3
+        ....
+        └─ class_folder_n
+    │─ test
+        └─ class_folder_1
+        └─ class_folder_2
+        └─ class_folder_3
+        ....
+        └─ class_folder_n
+```
+
+## How to run this
+
+### Create virtual environment
+
+This project was created using python 3.12. To create a virtual environment, do this:
+```
+# create virtual env in folder called "venv"
+python3 -m venv venv
+# activate virtual env
+source venv/bin/activate
+# install packages
+pip install -r requirements.txt
+```
+
+### Set up a prefect server
+
+The best option to do this is to use the provided ```docker-compose.yml``` file. This file has default parameters for everything, including database users and passwords. **DO NOT RUN THIS IN PRODUCTION AS IS** if you intend to deploy this anywhere public, create an .env file and do variable substitution in the ```docker-compose.yml``` file.
+
+To create and run the docker containers do:
+```
+docker compose up -d
+```
+To stop:
+```
+docker compose stop
+```
+The prefect server should be available at http://127.0.0.1:4200
+
+### Create file_list.py
+
+This file contains the list of files to be downloaded. It is a python array of dictionaries. Each entry has the form:
+```
+{
+    "file_url": "A public accessible url pointing to a *.zip file",
+    "downloaded_file_name": "The name which will be given to the downloaded file, (i.e file_1.zip)",
+    "exploded_folder_name": "The name of the folder contained in the zip file",
+    "species_label":"Label of the species contained in the folder (i.e gomphonema_clavatum)"
+}
+```
+Copy the provided template to a new file and edit as needed:
+```
+cp file_list.py.example file_list.py
+```
+
+### Run the task
+
+To run the task, simply run the file 01_flow.py
+```
+python 01_flow.py
+```
