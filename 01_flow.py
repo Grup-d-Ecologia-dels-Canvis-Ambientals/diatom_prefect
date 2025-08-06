@@ -7,6 +7,7 @@ import shutil
 from file_list import files
 from pathlib import Path
 import random
+from prefect.blocks.system import Secret
 
 BASE_DIR = "data"
 DOWNLOADS_DIR = "downloads"
@@ -16,7 +17,7 @@ N_TEST = 10
 @task(log_prints=True)
 def download_file(url: str, output_file: str) -> bool:
     try:
-        response = requests.get(url, stream=True, timeout=10)
+        response = requests.get(url, stream=True, timeout=20)
         if response.status_code == 200:
             with open(output_file, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=8192):
@@ -122,7 +123,7 @@ def verify_all_unzips(results: list[bool]):
     print("All unzips successful!")
 
 @flow(log_prints=True, retries=3)
-def download_files_flow():
+def download_files_flow():        
     dirs = create_directory_structure()
 
     urls_and_zips = [ (f['file_url'],f['downloaded_file_name']) for f in files ]
