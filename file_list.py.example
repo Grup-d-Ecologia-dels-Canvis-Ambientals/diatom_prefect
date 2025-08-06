@@ -1,8 +1,0 @@
-files = [
-    {
-        "file_url": "download url of the file",
-        "downloaded_file_name": "file name of the downloaded zip file",
-        "exploded_folder_name": "name of the uncompressed folder",
-        "species_label":"name of the category"
-    },    
-]

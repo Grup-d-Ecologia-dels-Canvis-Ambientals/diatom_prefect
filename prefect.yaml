@@ -16,11 +16,11 @@ push: null
 pull:
 - prefect.deployments.steps.git_clone:
     repository: https://github.com/aescobarr/diatom_prefect.git
-    branch: main
+    branch: 1-find-a-way-to-add-secrets-server-side
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
-- name: git_download_deploy
+- name: download_files_deployment
   version: null
   tags: []
   concurrency_limit: null

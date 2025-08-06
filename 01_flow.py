@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor
 import zipfile
 import os
 import shutil
-from file_list import files
 from pathlib import Path
 import random
 from prefect.blocks.system import Secret
@@ -32,7 +31,7 @@ def download_file(url: str, output_file: str) -> bool:
         return False
     
 @task(log_prints=True)
-def create_directory_structure() -> dict:    
+def create_directory_structure(files: list[dict]) -> dict:
     project_root = os.path.join(os.getcwd())
     print(f"Project root is {project_root}")
     try:
@@ -67,7 +66,7 @@ def create_directory_structure() -> dict:
     }
 
 @task(log_prints=True)
-def copy_files() -> None:
+def copy_files(files: list[dict]) -> None:
     download_and_output_folders = [ 
         ( os.path.join(BASE_DIR, DOWNLOADS_DIR,f['exploded_folder_name']), os.path.join(BASE_DIR, RESULTS_DIR), f['species_label']) for f in files
     ]    
@@ -123,8 +122,11 @@ def verify_all_unzips(results: list[bool]):
     print("All unzips successful!")
 
 @flow(log_prints=True, retries=3)
-def download_files_flow():        
-    dirs = create_directory_structure()
+def download_files_flow():   
+    secret_block = Secret.load("file-list")
+    files = secret_block.get()
+    
+    dirs = create_directory_structure(files)
 
     urls_and_zips = [ (f['file_url'],f['downloaded_file_name']) for f in files ]
     
@@ -149,7 +151,7 @@ def download_files_flow():
 
     verify_all_unzips(results)    
 
-    copy_files()
+    copy_files(files)
 
 
 if __name__ == "__main__":    
