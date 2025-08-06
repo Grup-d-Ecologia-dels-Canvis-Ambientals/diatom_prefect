@@ -51,9 +51,11 @@ docker compose stop
 ```
 The prefect server should be available at http://127.0.0.1:4200
 
-### Create file_list.py
+### Create secrets
 
-This file contains the list of files to be downloaded. It is a python array of dictionaries. Each entry has the form:
+For the flow to run, you have to create on the server a JSON secret called "file-list".
+
+This file contains the list of files to be downloaded. It is a json list of dictionaries. Each entry has the form:
 ```
 {
     "file_url": "A public accessible url pointing to a *.zip file",
@@ -62,10 +64,7 @@ This file contains the list of files to be downloaded. It is a python array of d
     "species_label":"Label of the species contained in the folder (i.e gomphonema_clavatum)"
 }
 ```
-Copy the provided template to a new file and edit as needed:
-```
-cp file_list.py.example file_list.py
-```
+
 
 ### Run the task
 
