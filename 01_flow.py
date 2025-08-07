@@ -7,6 +7,11 @@ import shutil
 from pathlib import Path
 import random
 from prefect.blocks.system import Secret
+from datetime import datetime
+
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 BASE_DIR = "data"
 DOWNLOADS_DIR = "downloads"
@@ -121,6 +126,51 @@ def verify_all_unzips(results: list[bool]):
         raise Exception("One or more unzips failed.")
     print("All unzips successful!")
 
+@task(log_prints=True)
+def compress_folder() -> str:
+    print("Compressing folder...")
+    now = datetime.now()
+    output_filename = now.strftime("diatom_set-%Y-%m-%d-%H-%M-%S")
+    shutil.make_archive(output_filename, 'zip', BASE_DIR)
+    print("Done compressing")
+    return f"{output_filename}.zip"
+
+@task(log_prints=True)
+def upload_to_owncloud(filename: str):
+    print(f"Uploading file {filename} to owncloud instance")
+    # OwnCloud credentials
+    username = 'admin'
+    password = 'admin'
+
+    # OwnCloud WebDAV endpoint
+    owncloud_url = 'http://127.0.0.1:8080/remote.php/dav/files/{username}/'
+
+    # Replace {username} in URL
+    owncloud_url = owncloud_url.format(username=username)
+
+    # Path in ownCloud to upload to
+    remote_path = filename
+
+    # Local file to upload
+    local_file_path = filename
+
+    # Full upload URL
+    upload_url = owncloud_url + remote_path
+
+    # Read the file and upload
+    with open(local_file_path, 'rb') as f:
+        response = requests.put(upload_url, auth=(username, password), data=f)
+
+    if response.status_code in (200, 201, 204):
+        print('Upload successful!')
+    else:
+        print('Upload failed:', response.status_code, response.text)
+
+@task(log_prints=True)
+def cleanup(filename: str):
+    print(f"Removing local file {filename}")
+    os.remove(filename)
+
 @flow(log_prints=True, retries=3)
 def download_files_flow():   
     secret_block = Secret.load("file-list")
@@ -152,6 +202,12 @@ def download_files_flow():
     verify_all_unzips(results)    
 
     copy_files(files)
+
+    compressed_file = compress_folder()
+
+    upload_to_owncloud(compressed_file)
+
+    cleanup(compressed_file)
 
 
 if __name__ == "__main__":    

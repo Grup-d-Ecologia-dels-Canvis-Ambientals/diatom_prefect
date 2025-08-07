@@ -65,10 +65,17 @@ This file contains the list of files to be downloaded. It is a json list of dict
 }
 ```
 
-
 ### Run the task
 
 To run the task, simply run the file 01_flow.py
 ```
 python 01_flow.py
 ```
+
+The task does the following:
+- downloads the files in the file_list secret to data/downloads.
+- explodes the files in the same data/downloads folder.
+- moves the files to the results folder. It creates a train and test subfolders, and inside this folders creates one subfolder for each "species_label" in the file_list secret.
+- It shuffles randomly the list of files for each downloaded folder, takes the first N_TEST files and puts them in data/results/test/[species_label]/, and the rest of files puts in data/results/train/[species_label]/
+- It compresses the data folder to a file which has the name "diatom_set-YYYY-MM-DD-HH-mm-ss.zip"
+- Finally it uploads the zip file to the local owncloud instance and deletes the local file.
