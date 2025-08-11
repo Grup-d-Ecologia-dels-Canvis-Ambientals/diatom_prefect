@@ -4,3 +4,4 @@ __pycache__
 file_list.py
 file_list.json
 *.zip
+*.code-workspace

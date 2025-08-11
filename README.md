@@ -22,6 +22,16 @@ data
         ....
         └─ class_folder_n
 ```
+Temptatively, once developed the workflow would implement these steps:  
+
+1. Download and organize data, i.e. images, for training and testing.  
+2. Create the docker image with the latest scripts for training and testing the model.  
+3. Start a GPU-server (institutional computing services, cloud-based server, or local-server).  
+3. Deploy the docker image in the server for training/testing the model.  
+4. Run the train.py and test.py scripts.  
+5. Download the trained model along with its evaluation results (if model trained some cloud service).  
+6. Stop the GPU-server (important for not to incur in unnecessary costs).  
+5. Deploy the model in the corresponding production models folder.  
 
 ## How to run this
 
