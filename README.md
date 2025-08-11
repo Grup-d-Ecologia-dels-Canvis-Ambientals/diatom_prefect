@@ -25,6 +25,9 @@ data
 
 ## How to run this
 
+### Clone this repository
+git clone https://github.com/Grup-d-Ecologia-dels-Canvis-Ambientals/diatom_prefect.git  
+
 ### Create virtual environment
 
 This project was created using python 3.12. To create a virtual environment, do this:
